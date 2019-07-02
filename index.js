@@ -35,6 +35,7 @@ video.on('info', function(info){
 	console.log('Saving to disk as: ' + name);
 
 	let rotateInt = 0;
+	let previousSize = 0;
 	progress = setInterval(function(){
 		const fileStat = fs.statSync('pendingDownload' + hash);
 		const fileSize = fileStat.size;
@@ -65,7 +66,12 @@ video.on('info', function(info){
 		} else if (rotateInt == 3) {
 			spinner = '\\';
 		}
-		process.stdout.write('\r\x1b[K' + spinner + ' Downloaded: ' + fileSize + ' out of ' + info.size + ' (' + percentage + '%) ' + bars);
+
+		const sizeDiff = parseInt(fileSize) - parseInt(previousSize);
+		const sizeDiffFormatted = Math.floor(sizeDiff / 1024 / 2);
+		previousSize = fileSize;
+
+		process.stdout.write('\r\x1b[K' + spinner + ' Downloaded: ' + fileSize + ' out of ' + info.size + ' (' + percentage + '%) ' + bars + ' @ ' + sizeDiffFormatted + 'KB/S');
 	}, 100);
 });
 
